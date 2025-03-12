@@ -1,6 +1,7 @@
 package br.com.portalservicos.portal_servicos_st.controller;
 
 import br.com.portalservicos.portal_servicos_st.dto.LoginRequestDTO;
+import br.com.portalservicos.portal_servicos_st.dto.LoginResponseDTO;
 import br.com.portalservicos.portal_servicos_st.entity.Usuario;
 import br.com.portalservicos.portal_servicos_st.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,13 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Senha incorreta");
         }
 
-        return ResponseEntity.ok("Login bem-sucedido");
+        LoginResponseDTO responseDTO = new LoginResponseDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getPermissao()
+        );
+
+        return ResponseEntity.ok(responseDTO);
     }
 }

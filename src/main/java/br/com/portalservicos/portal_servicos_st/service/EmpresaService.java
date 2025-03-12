@@ -14,6 +14,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class EmpresaService {
@@ -21,7 +23,7 @@ public class EmpresaService {
     private final UsuarioRepository usuarioRepository;
 
     @Transactional
-    public Empresa cadastrarEmpresaJuridica(EmpresaJuridicaRequestDTO dto, Usuario usuarioLogado) {
+    public Empresa cadastrarEmpresaJuridica(EmpresaJuridicaRequestDTO dto) {
         if (empresaRepository.findByCnpj(dto.cnpj()).isPresent()) {
             throw new RuntimeException("CNPJ já cadastrado!");
         }
@@ -33,13 +35,13 @@ public class EmpresaService {
         empresa.setNomeFantasia(dto.nomeFantasia());
         empresa.setPerfil(dto.perfil());
 
-        definirUsuarioResponsavelEStatus(empresa, usuarioLogado, dto.usuarioResponsavelId());
+        definirUsuarioResponsavelEStatus(empresa, dto.usuarioResponsavelId());
 
         return empresaRepository.save(empresa);
     }
 
     @Transactional
-    public Empresa cadastrarEmpresaFisica(EmpresaFisicaRequestDTO dto, Usuario usuarioLogado) {
+    public Empresa cadastrarEmpresaFisica(EmpresaFisicaRequestDTO dto) {
         if (empresaRepository.findByCpf(dto.cpf()).isPresent()) {
             throw new RuntimeException("CPF já cadastrado!");
         }
@@ -51,13 +53,13 @@ public class EmpresaService {
         empresa.setNomeFantasia(dto.nomeFantasia());
         empresa.setPerfil(dto.perfil());
 
-        definirUsuarioResponsavelEStatus(empresa, usuarioLogado, dto.usuarioResponsavelId());
+        definirUsuarioResponsavelEStatus(empresa, dto.usuarioResponsavelId());
 
         return empresaRepository.save(empresa);
     }
 
     @Transactional
-    public Empresa cadastrarEmpresaEstrangeira(EmpresaEstrangeiraRequestDTO dto, Usuario usuarioLogado) {
+    public Empresa cadastrarEmpresaEstrangeira(EmpresaEstrangeiraRequestDTO dto) {
         if (empresaRepository.findByIdentificadorEstrangeiro(dto.identificadorEstrangeiro()).isPresent()) {
             throw new RuntimeException("Identificador Estrangeiro já cadastrado!");
         }
@@ -69,20 +71,19 @@ public class EmpresaService {
         empresa.setNomeFantasia(dto.nomeFantasia());
         empresa.setPerfil(dto.perfil());
 
-        definirUsuarioResponsavelEStatus(empresa, usuarioLogado, dto.usuarioResponsavelId());
+        definirUsuarioResponsavelEStatus(empresa, dto.usuarioResponsavelId());
 
         return empresaRepository.save(empresa);
     }
 
-    private void definirUsuarioResponsavelEStatus(Empresa empresa, Usuario usuarioLogado, Long usuarioResponsavelId) {
-        if (usuarioLogado.getPermissao() == Permissoes.EMPRESA_CADASTRO) {
+    private void definirUsuarioResponsavelEStatus(Empresa empresa, Long usuarioResponsavelId) {
+        Usuario usuario = usuarioRepository.findById(usuarioResponsavelId)
+                .orElseThrow(() -> new RuntimeException("Usuário responsável não encontrado"));
+        if (usuario.getPermissao() == Permissoes.EMPRESA_CADASTRO) {
             empresa.setStatus(StatusEmpresa.PENDENTE);
-            empresa.setUsuarioResponsavel(usuarioLogado);
+            empresa.setUsuarioResponsavel(usuario);
         } else {
             empresa.setStatus(StatusEmpresa.APROVADO);
-            if (usuarioResponsavelId == null) {
-                throw new RuntimeException("Usuário interno deve indicar um usuário externo como responsável.");
-            }
             Usuario usuarioExterno = usuarioRepository.findById(usuarioResponsavelId)
                     .orElseThrow(() -> new RuntimeException("Usuário responsável não encontrado"));
             if (usuarioExterno.getPermissao() != Permissoes.EMPRESA_CADASTRO) {
@@ -90,5 +91,9 @@ public class EmpresaService {
             }
             empresa.setUsuarioResponsavel(usuarioExterno);
         }
+    }
+
+    public List<Empresa> listarTodasEmpresas() {
+        return empresaRepository.findAll();
     }
 }
