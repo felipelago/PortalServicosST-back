@@ -7,7 +7,6 @@ Desafio Processo Seletivo Super Terminais (Backend)
   <a href="#books-dependencias">Dependencias</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#star-requisitos">Requisitos</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;  
   <a href="#rocket-começando">Começando</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-  <a href="#computer-testando-o-projeto">Testando o Projeto</a>&nbsp;&nbsp;&nbsp;
 </p>
 
 ## :page_with_curl: Sobre
