@@ -46,18 +46,3 @@ Este repositório contém um sistema baseado em arquitetura Rest Api desenvolvid
   # Rodar a aplicação:
   $ mvn spring-boot:run
 ```
-
-## :computer: Testando o Projeto
-Crie um usuário para testar as funcionalidades com cadastrar uma empresa no Frontend, para isso abra o postman crie um novo Request com método GET e use o seguinte endpoint:
-```
-localhost:8080/api/v1/usuarios/cadastrar
-```
-No Body coloque
-```JSON
-{
-    "nome": "Teste",
-    "email": "teste@email.com",
-    "senha": "teste",
-    "permissao": "EMPRESA_CADASTRO"
-}
-```
